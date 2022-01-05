@@ -2,12 +2,12 @@ from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 
 application = Flask(__name__)
-app = application
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://john:password@localhost/pets'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db = SQLAlchemy(app)
+application.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://john:password@localhost/pets'
+application.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(application)
 
 
 class Pet(db.Model):
@@ -25,15 +25,15 @@ class Pet(db.Model):
 
 db.create_all()
 
-# The @app.route decorator is used to handle requests, and to define a function "index" that
+# The @application.route decorator is used to handle requests, and to define a function "index" that
 # is used to return a jsonified message
-@app.route('/')
+@application.route('/')
 def index():
     return jsonify({"message":"Welcome to my site"})
 
 
 #POST ENDPOINT
-@app.route('/pets', methods=['POST'])
+@application.route('/pets', methods=['POST'])
 def create_pet():
     pet_data = request.json
 
@@ -51,7 +51,7 @@ def create_pet():
 
 
 # Using the GET method to return all entries
-@app.route("/getpets", methods =['GET'])
+@application.route("/getpets", methods =['GET'])
 def get_pets():
     all_pets =[]
     pets = Pet.query.all()
@@ -64,7 +64,7 @@ def get_pets():
             "pet_description":pet.pet_description,
         }
 
-        all_pets.append(results)
+        all_pets.applicationend(results)
     return jsonify(
         {
              "success": True,
@@ -75,7 +75,7 @@ def get_pets():
 
 
 # Using the patch endpoint to update the details of a pet
-@app.route("/pets/<int:pet_id>", methods=["PATCH"])
+@application.route("/pets/<int:pet_id>", methods=["PATCH"])
 def update_pet(pet_id):
     pet = Pet.query.get(pet_id)
     pet_age = request.json['pet_age']
@@ -97,7 +97,7 @@ def update_pet(pet_id):
 
 
 # Using the Delete method to delete a pet from the database
-@app.route("/pets/<id>", methods=['DELETE'])
+@application.route("/pets/<id>", methods=['DELETE'])
 def pet_delete(id):
     pet = Pet.query.get(id)
     db.session.delete(pet)
@@ -109,4 +109,4 @@ def pet_delete(id):
     })
 
 if __name__ == '__main__':
-  app.run(debug=True)
+  application.run(debug=True)
